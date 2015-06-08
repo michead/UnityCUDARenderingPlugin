@@ -32,48 +32,62 @@ static GLuint vbo;
 struct cudaGraphicsResource *cuda_vbo_resource;
 void *d_vbo_buffer = NULL;
 
-extern "C" void EXPORT_API SetTimeFromUnity(float t) { g_Time = t; }
+typedef void(*FuncPtr)(const char *);
+FuncPtr Debug;
 
-extern "C"  float EXPORT_API ComputeSineWave(const float u, const float v)
+extern "C" EXPORT_API void SetDebugFunction(FuncPtr fp)
 {
-	return sin(u * g_Freq + g_Time) * cos(v * g_Freq + g_Time) * 0.5f;
+	Debug = fp;
 }
 
-__global__ void simple_vbo_kernel(float3 *pos, unsigned int width, unsigned int height, float time)
+extern "C" EXPORT_API void ComputeSineWave(float3* verts, int sideSize, float time)
+{
+	for (int i = 0; i < sideSize * sideSize; i ++) 
+		verts[i].y = sin(verts[i].x * g_Freq + time) * cos(verts[i].z * g_Freq + time) * 0.2f;
+}
+
+__global__ void simple_vbo_kernel(float3 *pos, unsigned int sideSize, float time)
 {
 	unsigned int x = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
 
 	// calculate uv coordinates
-	float u = x / (float)width;
-	float v = y / (float)height;
-	u = u*2.0f - 1.0f;
-	v = v*2.0f - 1.0f;
+	// float u = x / (float)width;
+	// float v = y / (float)height;
+	// u = u*2.0f - 1.0f;
+	// v = v*2.0f - 1.0f;
 
 	// calculate simple sine wave pattern
 	float freq = 4.0f;
-	float w = sinf(u*freq + time) * cosf(v*freq + time) * 0.5f;
+	// float w = sinf(u*freq + time) * cosf(v*freq + time) * 0.5f;
 
 	// write output vertex
-	pos[y*width + x] = make_float3(u, w, v);
+	int index = y * sideSize + x;
+	pos[index].y = sinf(pos[index].x * freq + time) * cosf(pos[index].z * freq + time) * 0.2f;
 }
 
-extern "C" float3* EXPORT_API ParallelComputeSineWave(float3* verts, float width, float height, float time)
+extern "C" EXPORT_API void ParallelComputeSineWave(float3* verts, int sideSize, float time)
 {
-	dim3 block(8, 8, 1);
-	dim3 grid(width / block.x, height / block.y, 1);
-	simple_vbo_kernel << < grid, block >> >(verts, width, height, time);
+	float3* dev_verts;
 
-	return verts;
+	cudaMalloc((void**)&dev_verts, sideSize * sideSize * sizeof(float3));
+	cudaMemcpy(dev_verts, verts, sideSize * sideSize * sizeof(float3), cudaMemcpyHostToDevice);
+
+	dim3 block(10, 10, 1);
+	dim3 grid(sideSize / block.x, sideSize / block.y, 1);
+	simple_vbo_kernel << < grid, block >> >(dev_verts, sideSize, time);
+
+	cudaMemcpy(verts, dev_verts, sideSize * sideSize * sizeof(float3), cudaMemcpyDeviceToHost);
+	cudaFree(dev_verts);
 }
 
 
 void launch_kernel(float3 *pos, unsigned int mesh_width, unsigned int mesh_height, float time)
 {
 	// execute the kernel
-	dim3 block(8, 8, 1);
-	dim3 grid(mesh_width / block.x, mesh_height / block.y, 1);
-	simple_vbo_kernel << < grid, block >> >(pos, mesh_width, mesh_height, time);
+	// dim3 block(8, 8, 1);
+	// dim3 grid(mesh_width / block.x, mesh_height / block.y, 1);
+	// simple_vbo_kernel << < grid, block >> >(pos, mesh_width, mesh_height, time);
 }
 
 
