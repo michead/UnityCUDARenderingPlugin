@@ -63,7 +63,8 @@ public class RenderingPlugin : MonoBehaviour
         tex.LoadRawTextureData(getBytesFromVector3Array(verts));
         tex.Apply();
 
-        GetComponent<MeshRenderer>().material.SetTexture(TEX_NAME_ID, tex);
+        // GetComponent<MeshRenderer>().material.SetTexture(TEX_NAME_ID, tex);
+        GetComponent<MeshRenderer>().material.mainTexture = tex;
         SetTextureFromUnity(tex.GetNativeTexturePtr());
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
@@ -193,7 +194,7 @@ public class RenderingPlugin : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
 
-            parallelComputeSineWave();
+            // parallelComputeSineWave();
 
             GL.IssuePluginEvent(UNITY_RENDER_EVENT_ID);
         }
