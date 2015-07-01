@@ -7,13 +7,19 @@ using System;
 public class RenderingPlugin : MonoBehaviour
 {
     public static Mesh mesh;
+    private static Shader shader;
 
-    public static float FREQ = 4.0f;
-    public static uint SIDE_SIZE = 250;
+    private static float FREQ = 4.0f;
+    private static uint MESH_SIZE = 250;
+
+    private static int UNITY_RENDER_EVENT_ID = 0;
+    private static String TEX_NAME_ID = "_MainTex";
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
 
+    [DllImport("RenderingPluginDLL")]
+    private static extern void UnityRenderEvent(int eventID);
     [DllImport("RenderingPluginDLL")]
     private static extern void Init([In, Out] Vector3[] verts, uint sideSize);
     [DllImport("RenderingPluginDLL")]
@@ -24,6 +30,8 @@ public class RenderingPlugin : MonoBehaviour
     private static extern void ComputeSineWave([In, Out] Vector3[] verts, float time);
     [DllImport("RenderingPluginDLL")]
     private static extern void ParallelComputeSineWave([In, Out] Vector3[] verts, float time);
+    [DllImport("RenderingPluginDLL")]
+    private static extern void SetTextureFromUnity(System.IntPtr texture);
 
     public string meshURL;
     Vector3[] verts;
@@ -32,12 +40,12 @@ public class RenderingPlugin : MonoBehaviour
     int numVerts;
     int numFaces;
 
-    void Start()
+    IEnumerator Start()
     {
         if (meshURL == null)
         {
             Debug.Log("Please choose a mesh to render!");
-            return;
+            yield return null;
         }
 
         mesh = new Mesh();
@@ -49,13 +57,15 @@ public class RenderingPlugin : MonoBehaviour
         IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         SetDebugFunction(intptrDelegate);
 
-        Init(verts, SIDE_SIZE);
-    }
+        Init(verts, MESH_SIZE);
 
-    void Update()
-    {
-        // computeSineWave();
-        parallelComputeSineWave();
+        Texture2D tex = new Texture2D((int)MESH_SIZE, (int)MESH_SIZE, TextureFormat.RGBAFloat, false);
+        tex.LoadRawTextureData(getBytesFromVector3Array(verts));
+        tex.Apply();
+
+        GetComponent<MeshRenderer>().material.SetTexture(TEX_NAME_ID, tex);
+        SetTextureFromUnity(tex.GetNativeTexturePtr());
+        yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
 
     void OnApplicationQuit()
@@ -153,5 +163,39 @@ public class RenderingPlugin : MonoBehaviour
     static void callback(string str)
     {
         Debug.Log("Callback: " + str);
+    }
+
+    byte[] getBytesFromVector3Array(Vector3[] array)
+    {
+        byte[] bytes = new byte[array.Length * 4 * 4];
+
+        int index = 0;
+        float zero = 0.0f;
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            Buffer.BlockCopy(BitConverter.GetBytes(array[i].x), 0, bytes, index, 4);
+            index += 4;
+            Buffer.BlockCopy(BitConverter.GetBytes(array[i].y), 0, bytes, index, 4);
+            index += 4;
+            Buffer.BlockCopy(BitConverter.GetBytes(array[i].z), 0, bytes, index, 4);
+            index += 4;
+            Buffer.BlockCopy(BitConverter.GetBytes(zero), 0, bytes, index, 4);
+            index += 4;
+        }
+
+        return bytes;
+    }
+
+    private IEnumerator CallPluginAtEndOfFrames()
+    {
+        while (true)
+        {
+            yield return new WaitForEndOfFrame();
+
+            parallelComputeSineWave();
+
+            GL.IssuePluginEvent(UNITY_RENDER_EVENT_ID);
+        }
     }
 }

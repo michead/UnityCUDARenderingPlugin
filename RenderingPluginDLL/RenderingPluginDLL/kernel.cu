@@ -30,7 +30,24 @@ typedef void(*FuncPtr)(const char *);
 FuncPtr Debug;
 
 float3* devVerts;
-unsigned int sideSize;
+unsigned int meshSize;
+
+static void* texPtr;
+
+void UpdateVertsInTex()
+{
+
+}
+
+extern "C" void EXPORT_API SetTextureFromUnity(void* texturePtr)
+{
+	texPtr = texturePtr;
+}
+
+extern "C" void EXPORT_API UnityRenderEvent(int eventID)
+{
+	UpdateVertsInTex();
+}
 
 extern "C" EXPORT_API void SetDebugFunction(FuncPtr fp)
 {
@@ -39,7 +56,7 @@ extern "C" EXPORT_API void SetDebugFunction(FuncPtr fp)
 
 extern "C" EXPORT_API void ComputeSineWave(float3* verts, float time)
 {
-	for (int i = 0; i < sideSize * sideSize; i ++) 
+	for (int i = 0; i < meshSize * meshSize; i++)
 		verts[i].y = sin(verts[i].x * FREQ + time) * cos(verts[i].z * FREQ + time) * 0.2f;
 }
 
@@ -57,18 +74,18 @@ __global__ void simple_vbo_kernel(float3 *pos, unsigned int sideSize, float time
 extern "C" EXPORT_API void ParallelComputeSineWave(float3* verts, float time)
 {
 	dim3 block(BLOCK_DIM_X, BLOCK_DIM_Y, 1);
-	dim3 grid(sideSize / block.x, sideSize / block.y, 1);
-	simple_vbo_kernel << < grid, block >> >(devVerts, sideSize, time);
+	dim3 grid(meshSize / block.x, meshSize / block.y, 1);
+	simple_vbo_kernel << < grid, block >> >(devVerts, meshSize, time);
 
-	cudaMemcpy(verts, devVerts, sideSize * sideSize * sizeof(float3), cudaMemcpyDeviceToHost);
+	cudaMemcpy(verts, devVerts, meshSize * meshSize * sizeof(float3), cudaMemcpyDeviceToHost);
 }
 
 extern "C" EXPORT_API void Init(float3* verts, unsigned int size)
 {
-	sideSize = size;
+	meshSize = size;
 
-	cudaMalloc((void**)&devVerts, sideSize * sideSize * sizeof(float3));
-	cudaMemcpy(devVerts, verts, sideSize * sideSize * sizeof(float3), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&devVerts, meshSize * meshSize * sizeof(float3));
+	cudaMemcpy(devVerts, verts, meshSize * meshSize * sizeof(float3), cudaMemcpyHostToDevice);
 }
 
 extern "C" EXPORT_API void Cleanup()
