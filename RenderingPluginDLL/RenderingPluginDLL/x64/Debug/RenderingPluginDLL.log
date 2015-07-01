@@ -1,8 +1,7 @@
-﻿Build started 7/1/2015 3:42:47 PM.
+﻿Build started 7/1/2015 10:34:32 PM.
      1>Project "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\RenderingPluginDLL.vcxproj" on node 2 (Rebuild target(s)).
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppClean.targets(76,5): warning : Access to the path 'c:\users\simone\desktop\rendering plugin\renderingplugin\assets\renderingplugindll.dll' is denied.
      1>CudaClean:
-         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmp9a2424b6b56d4e0d801d677735028010.cmd"
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpc81e5aacf1f84272b1989807fdba3dad.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile   -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean
          
          C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile   -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean 
@@ -11,14 +10,16 @@
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /DWIN64 /D_DEBUG /D_CONSOLE /D_WINDLL /D_MBCS /I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
        CudaBuild:
          Compiling CUDA source file kernel.cu...
-         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpe669caed7d9f4d7caaf86119d7179f10.cmd"
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpf1487cfddf3d4910a6a0ffc68cdae1c6.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu"
          
          C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(51): warning : variable "index" was declared but never referenced
      1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(35): warning : variable "texPtr" was set but never used
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(51): warning : variable "index" was declared but never referenced
      1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(35): warning : variable "texPtr" was set but never used
          kernel.cu
-     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(59): warning C4018: '<' : signed/unsigned mismatch
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(97): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.dll" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\lib" /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib freeglut.lib glew64.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.lib" /MACHINE:X64 /DLL x64\Debug\kernel.cu.obj
             Creating library C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.lib and object C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.exp
@@ -35,4 +36,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:11.91
+Time Elapsed 00:00:11.50

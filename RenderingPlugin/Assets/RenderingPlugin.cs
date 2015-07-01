@@ -13,7 +13,7 @@ public class RenderingPlugin : MonoBehaviour
     private static uint MESH_SIZE = 250;
 
     private static int UNITY_RENDER_EVENT_ID = 0;
-    private static String TEX_NAME_ID = "_MainTex";
+    // private static String TEX_NAME_ID = "_MainTex";
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
@@ -21,7 +21,7 @@ public class RenderingPlugin : MonoBehaviour
     [DllImport("RenderingPluginDLL")]
     private static extern void UnityRenderEvent(int eventID);
     [DllImport("RenderingPluginDLL")]
-    private static extern void Init([In, Out] Vector3[] verts, uint sideSize);
+    private static extern void Init([In, Out] Vector3[] verts, uint sideSize, IntPtr texRef, int texID);
     [DllImport("RenderingPluginDLL")]
     private static extern void Cleanup();
     [DllImport("RenderingPluginDLL")]
@@ -31,7 +31,7 @@ public class RenderingPlugin : MonoBehaviour
     [DllImport("RenderingPluginDLL")]
     private static extern void ParallelComputeSineWave([In, Out] Vector3[] verts, float time);
     [DllImport("RenderingPluginDLL")]
-    private static extern void SetTextureFromUnity(System.IntPtr texture);
+    private static extern void SetTimeFromUnity(float t);
 
     public string meshURL;
     Vector3[] verts;
@@ -57,15 +57,15 @@ public class RenderingPlugin : MonoBehaviour
         IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         SetDebugFunction(intptrDelegate);
 
-        Init(verts, MESH_SIZE);
-
         Texture2D tex = new Texture2D((int)MESH_SIZE, (int)MESH_SIZE, TextureFormat.RGBAFloat, false);
         tex.LoadRawTextureData(getBytesFromVector3Array(verts));
         tex.Apply();
 
         // GetComponent<MeshRenderer>().material.SetTexture(TEX_NAME_ID, tex);
         GetComponent<MeshRenderer>().material.mainTexture = tex;
-        SetTextureFromUnity(tex.GetNativeTexturePtr());
+
+        Init(verts, MESH_SIZE, tex.GetNativeTexturePtr(), tex.GetNativeTextureID());
+
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
 
@@ -195,8 +195,12 @@ public class RenderingPlugin : MonoBehaviour
             yield return new WaitForEndOfFrame();
 
             // parallelComputeSineWave();
-
-            GL.IssuePluginEvent(UNITY_RENDER_EVENT_ID);
+            SetTimeFromUnity(Time.timeSinceLevelLoad);
         }
+    }
+
+    public void OnPostRender()
+    {
+        GL.IssuePluginEvent(UNITY_RENDER_EVENT_ID);
     }
 }
