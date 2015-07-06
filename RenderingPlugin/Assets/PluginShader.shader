@@ -1,6 +1,5 @@
 ﻿Shader "Custom/PluginShader" {
 	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 	}
 	SubShader {
@@ -8,18 +7,16 @@
 
         Pass {
             GLSLPROGRAM
+            #extension GL_EXT_gpu_shader4 : enable
 
-			varying mediump vec2 uv;
 			uniform mediump sampler2D _MainTex;
-            uniform mediump vec4 _Color;
-            uniform sampler2D textureSampler;
-
             varying vec4 textureCoordinates;
 
             #ifdef VERTEX
             void main()
             {
                 textureCoordinates = gl_MultiTexCoord0;
+                vec4 vertex = vec4(texelFetch(_MainTex, gl_VertexID, 0).xyz, 1);
                 gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
             }
             #endif
