@@ -12,18 +12,22 @@
 			varying mediump vec2 uv;
 			uniform mediump sampler2D _MainTex;
             uniform mediump vec4 _Color;
+            uniform sampler2D textureSampler;
+
+            varying vec4 textureCoordinates;
 
             #ifdef VERTEX
             void main()
             {
-                gl_Position = gl_ModelViewProjectionMatrix * gl_MultiTexCoord0;
+                textureCoordinates = gl_MultiTexCoord0;
+                gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
             }
             #endif
  
             #ifdef FRAGMENT
             void main()
             {
-                gl_FragColor = _Color;
+                gl_FragColor = texture2D(_MainTex, vec2(textureCoordinates));
             }
             #endif
 
