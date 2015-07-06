@@ -23,8 +23,8 @@
 #define EXPORT_API __declspec(dllexport)
 
 #define FREQ 4.0f
-#define BLOCK_DIM_X 10
-#define BLOCK_DIM_Y 10
+#define BLOCK_DIM_X 8
+#define BLOCK_DIM_Y 8
 
 typedef void(*FuncPtr)(const char *);
 FuncPtr Debug;
@@ -32,28 +32,26 @@ FuncPtr Debug;
 float3* devVerts;
 unsigned int meshSize;
 
-static void* texPtr;
 static struct cudaGraphicsResource* cgr;
-GLuint texID;
-struct cudaArray* cudaArray;
-texture<float4, cudaTextureType2D, cudaReadModeElementType> tex;
+static void* texPtr;
+static GLuint texID;
 
 static float unityTime;
 
 extern "C" void EXPORT_API SetTimeFromUnity(float t) { unityTime = t; }
 
-__global__ void simple_vbo_kernel(cudaSurfaceObject_t cso, dim3 dimension, float time)
+
+__global__ void simple_vbo_kernel(cudaSurfaceObject_t cso, float time)
 {
 	unsigned int x = blockIdx.x*blockDim.x + threadIdx.x;
 	unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
 
 	float freq = 4.0f;
-	int index = y * dimension.x + x;
 
-	float4 vert = surf2Dread<float4>(cso, (int)sizeof(float4)*x, y, cudaBoundaryModeClamp);
+	float4 vert = surf2Dread<float4>(cso, (int)sizeof(float4)*x, y, cudaBoundaryModeZero);
 	vert.y = sinf(vert.x * freq + time) * cosf(vert.z * freq + time) * 0.2f;
 
-	surf2Dwrite(vert, cso, (int)sizeof(float4)*x, y, cudaBoundaryModeClamp);
+	surf2Dwrite(vert, cso, (int)sizeof(float4)*x, y, cudaBoundaryModeZero);
 }
 
 __global__ void simple_vbo_kernel_2(float3 *pos, unsigned int sideSize, float time)
@@ -67,19 +65,46 @@ __global__ void simple_vbo_kernel_2(float3 *pos, unsigned int sideSize, float ti
 	pos[index].y = sinf(pos[index].x * freq + time) * cosf(pos[index].z * freq + time) * 0.2f;
 }
 
+void CheckPluginErrors(cudaError err, const char* context)
+{
+	if (err != cudaSuccess)
+	{
+		const char* errName = cudaGetErrorName(err);
+		const char* errString = cudaGetErrorString(err);
+
+		char* errMessage = (char*)calloc(strlen(errName) + strlen(errString) + 8, sizeof(char));
+		strcpy(errMessage, context);
+		strcat(errMessage, " --> ");
+		strcat(errMessage, errName);
+		strcat(errMessage, ": ");
+		strcat(errMessage, errString);
+
+		Debug(errMessage);
+	}
+}
+
 void UpdateVertsInTex()
 {
-	struct cudaResourceDesc description;
-	memset(&description, 0, sizeof(description));
-	description.resType = cudaResourceTypeArray;
-	description.res.array.array = cudaArray;
+	CheckPluginErrors(cudaGraphicsMapResources(1, &cgr), "Error encountered while mapping resource");
+
+	cudaArray_t cudaArray;
+	CheckPluginErrors(cudaGraphicsSubResourceGetMappedArray(&cudaArray, cgr, 0, 0), "Error encountered while mapping graphics resource to CUDA array.");
+
+	cudaResourceDesc desc;
+	desc.resType = cudaResourceTypeArray;
+	desc.res.array.array = cudaArray;
 
 	cudaSurfaceObject_t cso;
-	checkCudaErrors((cudaCreateSurfaceObject(&cso, &description)));
+	CheckPluginErrors(cudaCreateSurfaceObject(&cso, &desc), "Error encountered while creating Surface Object.");
 
 	dim3 block(BLOCK_DIM_X, BLOCK_DIM_Y, 1);
 	dim3 grid(meshSize / block.x, meshSize / block.y, 1);
-	simple_vbo_kernel << < grid, block >> >(cso, meshSize, unityTime);
+	simple_vbo_kernel << < grid, block >> >(cso, unityTime);
+
+	CheckPluginErrors(cudaGetLastError(), "Error in kernel execution.");
+	CheckPluginErrors(cudaDestroySurfaceObject(cso), "Error encountered while destroying Surface Object.");
+	CheckPluginErrors(cudaGraphicsUnmapResources(1, &cgr), "Error encountered while unmapping resource.");
+	CheckPluginErrors(cudaStreamSynchronize(0), "Error in stream synchronization.");
 }
 
 extern "C" void EXPORT_API UnityRenderEvent(int eventID)
@@ -107,23 +132,16 @@ extern "C" EXPORT_API void ParallelComputeSineWave(float3* verts, float time)
 	cudaMemcpy(verts, devVerts, meshSize * meshSize * sizeof(float3), cudaMemcpyDeviceToHost);
 }
 
-extern "C" EXPORT_API void Init(float3* verts, unsigned int size, void* texturePtr, int textureID)
+extern "C" EXPORT_API void Init(float3* verts, unsigned int size, void* tPtr)
 {
 	meshSize = size;
-	texPtr = texturePtr;
-	texID = textureID;
+	texPtr = tPtr;
+	texID = (GLuint)(size_t)(texPtr);
 
-	checkCudaErrors(cudaGraphicsGLRegisterImage(&cgr, texID, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone));
-	checkCudaErrors(cudaGraphicsMapResources(1, &cgr));
-	checkCudaErrors(cudaGraphicsSubResourceGetMappedArray(&cudaArray, cgr, 0, 0));
-	if(!cudaBindTextureToArray(tex, cudaArray)) Debug("Error encountered while binding texture to array.");
+	CheckPluginErrors(cudaGraphicsGLRegisterImage(&cgr, texID, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone), "Error encountered while registering resource.");
 }
 
 extern "C" EXPORT_API void Cleanup()
 {
-
-	checkCudaErrors(cudaUnbindTexture(tex));
-	checkCudaErrors(cudaGraphicsUnmapResources(1, &cgr, 0));
-	cudaGLUnregisterBufferObject(texID);
-	cudaGraphicsUnregisterResource(cgr);
+	CheckPluginErrors(cudaGraphicsUnregisterResource(cgr), "Error encountered while unregistering resource.");
 }

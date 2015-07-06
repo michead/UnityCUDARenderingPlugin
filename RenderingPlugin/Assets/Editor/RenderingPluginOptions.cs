@@ -13,7 +13,7 @@ class RenderingPluginOptions
 					"obj");
         Debug.Log("Path:" + path);
 
-        GameObject pluginObj = GameObject.Find("PluginObj");
+        GameObject pluginObj = GameObject.Find("PluginGameObject");
         RenderingPlugin rp = pluginObj.GetComponent<RenderingPlugin>();
         if (path != null && path != "") rp.meshURL = path;
 	}
