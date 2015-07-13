@@ -24,9 +24,14 @@
         }
 
         void vert(inout appdata_full v){
-            float4 tex = tex2Dlod (_MainTex, float4(v.texcoord.xy,0,0));
-            tex = mul (UNITY_MATRIX_MVP, tex);
-            v.vertex.y = tex.y;
+            float4 texY = tex2Dlod (_MainTex, float4(v.texcoord.xy,0,0));
+
+            float3 v0 = v.vertex.xyz + (0.1, 0.1, 0.1);
+
+            v.normal = normalize(v0);
+
+            v.vertex.y = texY.y;
+
         }
         ENDCG
     }
@@ -69,6 +74,9 @@ Shader "Custom/PluginShader" {
     }
 }
 
+if(v.texcoord[0] == 1.0f && v.texcoord[1] == 1.0f) v.vertex.y = 1.5f;
+v.vertex.y += sin(v.vertex.x * 4.0f + _Time[1]) * cos(v.vertex.z * 4.0f + _Time[1]) * 0.5f;
+tex = mul (UNITY_MATRIX_MVP, tex);
 #pragma glsl
 fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 return mul (UNITY_MATRIX_MVP, v);
