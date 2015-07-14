@@ -11,6 +11,7 @@
         #pragma surface surf Lambert vertex:vert
 
         sampler2D _MainTex;
+        sampler2D _BumpMap;
         fixed4 _Color;
 
         struct Input {
@@ -24,14 +25,11 @@
         }
 
         void vert(inout appdata_full v){
-            float4 texY = tex2Dlod (_MainTex, float4(v.texcoord.xy,0,0));
+            float4 tex = tex2Dlod (_MainTex, float4(v.texcoord.xy,0,0));
+            v.vertex.xyz = tex.xyz;
 
-            float3 v0 = v.vertex.xyz + (0.1, 0.1, 0.1);
-
-            v.normal = normalize(v0);
-
-            v.vertex.y = texY.y;
-
+            float4 nTex = tex2Dlod (_BumpMap, float4(v.texcoord.xy,0,0));
+            v.normal = nTex.xyz;
         }
         ENDCG
     }
@@ -74,6 +72,8 @@ Shader "Custom/PluginShader" {
     }
 }
 
+float3 v0 = v.vertex.xyz + (0.1, 0.1, 0.1);
+v.normal = normalize(v0);
 if(v.texcoord[0] == 1.0f && v.texcoord[1] == 1.0f) v.vertex.y = 1.5f;
 v.vertex.y += sin(v.vertex.x * 4.0f + _Time[1]) * cos(v.vertex.z * 4.0f + _Time[1]) * 0.5f;
 tex = mul (UNITY_MATRIX_MVP, tex);

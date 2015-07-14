@@ -7,11 +7,11 @@ using System;
 public class RenderingPlugin : MonoBehaviour
 {
     public static Mesh mesh;
-    private static Shader shader;
     private static float FREQ = 4.0f;
     private static int MESH_SIZE = 11;
     private static int UNITY_RENDER_EVENT_ID = 0;
-    private static Texture2D tex;
+    private static String NORMAL_TEXTURE_ID = "_BumpMap";
+    private static Texture2D tex, nTex;
     public bool useMeshURL = false;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -20,7 +20,7 @@ public class RenderingPlugin : MonoBehaviour
     [DllImport("RenderingPluginDLL")]
     private static extern void UnityRenderEvent(int eventID);
     [DllImport("RenderingPluginDLL")]
-    private static extern void Init([In, Out] Vector3[] verts, uint sideSize, IntPtr texPtr);
+    private static extern void Init(int sideSize, IntPtr texPtr, IntPtr nTexPtr, [In, Out] int[] triangles, int trCount);
     [DllImport("RenderingPluginDLL")]
     private static extern void Cleanup();
     [DllImport("RenderingPluginDLL")]
@@ -50,7 +50,12 @@ public class RenderingPlugin : MonoBehaviour
             }
             else getMeshDataFromFile(meshURL);
         }
-        else MESH_SIZE = (int)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+        else
+        {
+            MESH_SIZE = (int)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+
+            mesh = GetComponent<MeshFilter>().mesh;
+        }
 
         verts = GetComponent<MeshFilter>().mesh.vertices;
 
@@ -60,11 +65,17 @@ public class RenderingPlugin : MonoBehaviour
 
         byte[] textureData = getBytesFromVector3Array(verts);
         tex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
-        FillTextureWithVertices(tex, verts);
+        FillTextureWithData(tex, verts, false);
         tex.Apply();
         GetComponent<Renderer>().material.mainTexture = tex;
 
-        Init(verts, (uint)MESH_SIZE, tex.GetNativeTexturePtr());
+        triangles = mesh.triangles;
+        nTex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
+        FillTextureWithData(nTex, mesh.normals, true);
+        nTex.Apply();
+        GetComponent<Renderer>().material.SetTexture(NORMAL_TEXTURE_ID, nTex);
+
+        Init(MESH_SIZE, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
@@ -174,11 +185,13 @@ public class RenderingPlugin : MonoBehaviour
         return bytes;
     }
 
-    private void FillTextureWithVertices(Texture2D tex, Vector3[] vertices)
+    private void FillTextureWithData(Texture2D tex, Vector3[] vertices, bool n)
     {
+        float alpha = n ? 0.0f : 1.0f;
+
         for(int i = 0; i < vertices.Length; i++){
             Vector3 v = vertices[i];
-            Color color = new Color(v[0], v[1], v[2], 1.0f);
+            Color color = new Color(v[0], v[1], v[2], alpha);
             tex.SetPixel(i / MESH_SIZE, i % MESH_SIZE, color);
         }
     }
