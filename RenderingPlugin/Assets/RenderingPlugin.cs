@@ -13,6 +13,9 @@ public class RenderingPlugin : MonoBehaviour
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
     private static Texture2D tex, nTex;
     public bool useMeshURL = false;
+    private Vector2 oldMousePos;
+    private bool isRotating = false;
+    private static float ROTATION_SCALE = 5;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
@@ -78,6 +81,27 @@ public class RenderingPlugin : MonoBehaviour
         Init(MESH_SIZE, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
         yield return StartCoroutine("CallPluginAtEndOfFrames");
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            isRotating = true;
+            oldMousePos = Input.mousePosition;
+        }
+        else if (Input.GetMouseButtonUp(1)) isRotating = false;
+        else if (isRotating) RotateMesh();
+    }
+
+    void RotateMesh()
+    {
+        Vector2 mousePos = new Vector2( Input.mousePosition.x, Input.mousePosition.y );
+        Vector2 delta = mousePos - oldMousePos;
+        oldMousePos = mousePos;
+
+        transform.Rotate(-Vector3.right * delta.y * Time.deltaTime * ROTATION_SCALE);
+        transform.Rotate(Vector3.forward * delta.x * Time.deltaTime * ROTATION_SCALE);
     }
 
     void OnApplicationQuit()
