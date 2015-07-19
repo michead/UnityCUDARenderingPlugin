@@ -24,10 +24,10 @@
 				ivec2 tCoord = ivec2(gl_VertexID / texSize, gl_VertexID % texSize);
 				
 				vec4 vertex = texelFetch(_MainTex, tCoord, 0);
-				vec4 normal = texelFetch(_BumpMap, tCoord, 0);
+				vec3 normal = texelFetch(_BumpMap, tCoord, 0).xyz;
 				
 				gl_Position = gl_ModelViewProjectionMatrix * vertex;
-				gl_Normal = gl_ModelViewMatrix * normal;
+				gl_Normal = gl_NormalMatrix * normal;
 				
 				vec3 lightPos = vec3(lightX, lightY, lightZ);
 				light = dot(normalize(lightPos - vertex.xyz), normal.xyz);

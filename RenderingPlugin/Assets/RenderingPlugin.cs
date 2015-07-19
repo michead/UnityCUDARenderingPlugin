@@ -7,8 +7,7 @@ using System;
 public class RenderingPlugin : MonoBehaviour
 {
     public static Mesh mesh;
-    private static float FREQ = 4.0f;
-    private static int MESH_SIZE = 11;
+    private static int MESH_SIZE;
     private static int UNITY_RENDER_EVENT_ID = 0;
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
     private static String TEXTURE_SIZE_ID = "texSize";
@@ -55,12 +54,9 @@ public class RenderingPlugin : MonoBehaviour
             }
             else getMeshDataFromFile(meshURL);
         }
-        else
-        {
-            MESH_SIZE = (int)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+        else mesh = GetComponent<MeshFilter>().mesh;
 
-            mesh = GetComponent<MeshFilter>().mesh;
-        }
+        MESH_SIZE = (int)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
 
         verts = GetComponent<MeshFilter>().mesh.vertices;
 
@@ -68,7 +64,6 @@ public class RenderingPlugin : MonoBehaviour
         IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         SetDebugFunction(intptrDelegate);
 
-        byte[] textureData = getBytesFromVector3Array(verts);
         tex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
         FillTextureWithData(tex, verts, false);
         tex.Apply();
@@ -124,7 +119,7 @@ public class RenderingPlugin : MonoBehaviour
         mesh.vertices = verts;
         mesh.triangles = triangles;
 
-        mesh.RecalculateNormals();
+        setMeshUVs();
 
         GetComponent<MeshFilter>().mesh = mesh;
     }
@@ -155,6 +150,18 @@ public class RenderingPlugin : MonoBehaviour
                 verts[index++] = new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]));
             }
         }
+    }
+
+    void setMeshUVs()
+    {
+        Vector2[] uvs = new Vector2[mesh.vertices.Length];
+
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            uvs[i] = new Vector2(mesh.vertices[i].x, mesh.vertices[i].z);
+        }
+
+        mesh.uv = uvs;
     }
 
     void getFacesFromFile(string url)
