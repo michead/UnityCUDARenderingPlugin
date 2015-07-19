@@ -11,11 +11,13 @@ public class RenderingPlugin : MonoBehaviour
     private static int MESH_SIZE = 11;
     private static int UNITY_RENDER_EVENT_ID = 0;
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
+    private static String TEXTURE_SIZE_ID = "texSize";
     private static Texture2D tex, nTex;
     public bool useMeshURL = false;
     private Vector2 oldMousePos;
     private bool isRotating = false;
     private static float ROTATION_SCALE = 5;
+    private static Material material;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
@@ -76,7 +78,10 @@ public class RenderingPlugin : MonoBehaviour
         nTex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
         FillTextureWithData(nTex, mesh.normals, true);
         nTex.Apply();
-        GetComponent<Renderer>().material.SetTexture(NORMAL_TEXTURE_ID, nTex);
+
+        material = GetComponent<Renderer>().material;
+        material.SetTexture(NORMAL_TEXTURE_ID, nTex);
+        material.SetInt(TEXTURE_SIZE_ID, MESH_SIZE);
 
         Init(MESH_SIZE, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 

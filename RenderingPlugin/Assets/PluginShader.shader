@@ -1,32 +1,47 @@
 ﻿Shader "Custom/PluginShader" {
+	Properties{
+		lightX ("Light X", Range (-10, 10)) = 1
+		lightY ("Light Y", Range (-10, 10)) = 2
+		lightZ ("Light Z", Range (-10, 10)) = 0
+	}
     SubShader {
-        Tags { "RenderType"="Opaque" }
-
-        CGPROGRAM
-        #pragma surface surf Lambert vertex:vert
-
-        sampler2D _MainTex;
-        sampler2D _BumpMap;
-
-        struct Input {
-            float2 uv_MainTex;
-        };
-
-        void surf (Input IN, inout SurfaceOutput o) {
-            fixed4 c = tex2Dlod (_BumpMap, float4(IN.uv_MainTex,0,0));
-            o.Albedo = fixed4(1, 1, 1, 1);
-            o.Alpha = 1.0f;
-        }
-
-        void vert(inout appdata_full v){
-            float4 tex = tex2Dlod (_MainTex, float4(v.texcoord.xy,0,0));
-            v.vertex.y = tex.y;
-
-            float4 nTex = tex2Dlod (_BumpMap, float4(v.texcoord.xy,0,0));
-            v.normal = nTex.xyz;
-        }
-        ENDCG
+        Tags { "Queue" = "Geometry" }
+        Pass {
+			GLSLPROGRAM
+			#extension GL_EXT_gpu_shader4 : enable
+		
+			uniform mediump sampler2D _MainTex;
+			uniform mediump sampler2D _BumpMap;
+			
+			uniform int texSize;
+			
+			uniform float lightX, lightY, lightZ;
+			varying vec3 light;
+        
+			#ifdef VERTEX
+			void main()
+			{
+				ivec2 tCoord = ivec2(gl_VertexID / texSize, gl_VertexID % texSize);
+				
+				vec4 vertex = texelFetch(_MainTex, tCoord, 0);
+				vec4 normal = texelFetch(_BumpMap, tCoord, 0);
+				
+				gl_Position = gl_ModelViewProjectionMatrix * vertex;
+				gl_Normal = gl_ModelViewMatrix * normal;
+				
+				vec3 lightPos = vec3(lightX, lightY, lightZ);
+				light = dot(normalize(lightPos - vertex.xyz), normal.xyz);
+			}
+			#endif
+ 
+			#ifdef FRAGMENT
+			void main()
+			{
+				gl_FragColor = vec4(vec3(1, 1, 1) * light, 1);
+			}
+			#endif
+        
+			ENDGLSL
+		}
     }
-
-    Fallback "VertexLit"
 }
