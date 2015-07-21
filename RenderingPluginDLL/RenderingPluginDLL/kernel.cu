@@ -25,7 +25,7 @@
 typedef void(*FuncPtr)(const char *);
 FuncPtr Debug;
 
-static int meshSize;
+static int texSize;
 
 static int* triangles;
 static int triangleCount;
@@ -159,9 +159,9 @@ void UpdateVertsInTex()
 	cudaSurfaceObject_t nCso;
 	CheckPluginErrors(cudaCreateSurfaceObject(&nCso, &nDesc), "Error encountered while creating Surface Object.");
 
-	dim3 block(meshSize, meshSize, 1);
-	dim3 grid(meshSize / block.x, meshSize / block.y, 1);
-	plugin_kernel << < grid, block >> >(cso, nCso, meshSize, devTArray, triangleCount, unityTime);
+	dim3 block(texSize, texSize, 1);
+	dim3 grid(texSize / block.x, texSize / block.y, 1);
+	plugin_kernel << < grid, block >> >(cso, nCso, texSize, devTArray, triangleCount, unityTime);
 
 	CheckPluginErrors(cudaGetLastError(), "Error in kernel execution.");
 
@@ -186,7 +186,7 @@ extern "C" EXPORT_API void SetDebugFunction(FuncPtr fp)
 
 extern "C" EXPORT_API void Init(int size, void* tPtr, void* nTPtr, int* tr, int trCount)
 {
-	meshSize = size;
+	texSize = size;
 
 	triangles = tr;
 	triangleCount = trCount;

@@ -25,10 +25,9 @@
 			{
 				ivec2 tCoord = ivec2(gl_VertexID / texSize, gl_VertexID % texSize);
 				
-				vec4 vertex = texelFetch(_MainTex, tCoord, 0);
+				vec4 vertex = vec4(texelFetch(_MainTex, tCoord, 0).xyz, 1);
 				vec3 normal = texelFetch(_BumpMap, tCoord, 0).xyz;
 				
-				gl_Vertex = vertex;
 				gl_Position = gl_ModelViewProjectionMatrix * vertex;
 				gl_Normal = gl_NormalMatrix * normal;
 				

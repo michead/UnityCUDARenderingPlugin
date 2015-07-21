@@ -7,16 +7,20 @@ using System;
 public class RenderingPlugin : MonoBehaviour
 {
     public static Mesh mesh;
-    private static int MESH_SIZE;
+    public string meshURL;
+    public bool useGLSLShader = true;
+    public bool useMeshPath = false;
+
+    private static int texSize;
+    private static Texture2D tex, nTex;
+    private Vector2 oldMousePos;
+    private bool isRotating = false;
+    private static Material material;
+
     private static int UNITY_RENDER_EVENT_ID = 0;
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
     private static String TEXTURE_SIZE_ID = "texSize";
-    private static Texture2D tex, nTex;
-    public bool useMeshURL = false;
-    private Vector2 oldMousePos;
-    private bool isRotating = false;
     private static float ROTATION_SCALE = 5;
-    private static Material material;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
@@ -36,7 +40,6 @@ public class RenderingPlugin : MonoBehaviour
     [DllImport("RenderingPluginDLL")]
     private static extern void SetTimeFromUnity(float t);
 
-    public string meshURL;
     Vector3[] verts;
     int[] triangles;
 
@@ -45,7 +48,7 @@ public class RenderingPlugin : MonoBehaviour
 
     IEnumerator Start()
     {
-        if (useMeshURL)
+        if (useMeshPath)
         {
             if (meshURL == null)
             {
@@ -56,7 +59,9 @@ public class RenderingPlugin : MonoBehaviour
         }
         else mesh = GetComponent<MeshFilter>().mesh;
 
-        MESH_SIZE = (int)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+
+        float texSizeF = (float)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+        texSize = texSizeF == (int)texSizeF ? (int)texSizeF : (int)texSizeF + 1;
 
         verts = GetComponent<MeshFilter>().mesh.vertices;
 
@@ -64,21 +69,24 @@ public class RenderingPlugin : MonoBehaviour
         IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         SetDebugFunction(intptrDelegate);
 
-        tex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
-        FillTextureWithData(tex, verts, false);
+        material = GetComponent<Renderer>().material;
+        if (useGLSLShader) material.shader = Shader.Find("Custom/PluginShader");
+        else material.shader = Shader.Find("Custom/PluginShader2");
+
+        tex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
+        FillTextureWithData(tex, verts);
         tex.Apply();
-        GetComponent<Renderer>().material.mainTexture = tex;
+        material.mainTexture = tex;
 
         triangles = mesh.triangles;
-        nTex = new Texture2D(MESH_SIZE, MESH_SIZE, TextureFormat.RGBAFloat, false);
-        FillTextureWithData(nTex, mesh.normals, true);
+        nTex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
+        FillTextureWithData(nTex, mesh.normals);
         nTex.Apply();
 
-        material = GetComponent<Renderer>().material;
         material.SetTexture(NORMAL_TEXTURE_ID, nTex);
-        material.SetInt(TEXTURE_SIZE_ID, MESH_SIZE);
+        material.SetInt(TEXTURE_SIZE_ID, texSize);
 
-        Init(MESH_SIZE, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
+        Init(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
@@ -221,14 +229,12 @@ public class RenderingPlugin : MonoBehaviour
         return bytes;
     }
 
-    private void FillTextureWithData(Texture2D tex, Vector3[] vertices, bool n)
+    private void FillTextureWithData(Texture2D tex, Vector3[] vertices)
     {
-        float alpha = n ? 0.0f : 1.0f;
-
         for(int i = 0; i < vertices.Length; i++){
             Vector3 v = vertices[i];
-            Color color = new Color(v[0], v[1], v[2], alpha);
-            tex.SetPixel(i / MESH_SIZE, i % MESH_SIZE, color);
+            Color color = new Color(v[0], v[1], v[2], i);
+            tex.SetPixel(i / texSize, i % texSize, color);
         }
     }
 
