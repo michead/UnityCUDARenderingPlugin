@@ -1,7 +1,7 @@
-﻿Build started 7/14/2015 5:49:38 PM.
+﻿Build started 7/21/2015 12:10:15 PM.
      1>Project "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\RenderingPluginDLL.vcxproj" on node 2 (Rebuild target(s)).
      1>CudaClean:
-         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpdd9703d56f7c457cbb282c43c93a7f20.cmd"
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpdb736fa81b4e475aba707ffaa3082c91.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile   -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean
          
          C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile   -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean 
@@ -10,7 +10,7 @@
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /DWIN64 /D_DEBUG /D_CONSOLE /D_WINDLL /D_MBCS /I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
        CudaBuild:
          Compiling CUDA source file kernel.cu...
-         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmp1dffab610b8040bda76bcfb052fd643e.cmd"
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmpcefd4cc716d849d087913c46d4aa3dfa.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu"
          
          C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o x64\Debug\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
@@ -31,4 +31,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:10.06
+Time Elapsed 00:00:09.53

@@ -3,9 +3,9 @@
 		lightX ("Light X", Range (-10, 10)) = 1
 		lightY ("Light Y", Range (-10, 10)) = 2
 		lightZ ("Light Z", Range (-10, 10)) = 0
+		_Color ("Color", Color) = (1, 1, 1, 1)
 	}
     SubShader {
-        Tags { "Queue" = "Geometry" }
         Pass {
 			GLSLPROGRAM
 			#extension GL_EXT_gpu_shader4 : enable
@@ -17,6 +17,8 @@
 			
 			uniform float lightX, lightY, lightZ;
 			varying vec3 light;
+
+			uniform vec4 _Color;
         
 			#ifdef VERTEX
 			void main()
@@ -26,6 +28,7 @@
 				vec4 vertex = texelFetch(_MainTex, tCoord, 0);
 				vec3 normal = texelFetch(_BumpMap, tCoord, 0).xyz;
 				
+				gl_Vertex = vertex;
 				gl_Position = gl_ModelViewProjectionMatrix * vertex;
 				gl_Normal = gl_NormalMatrix * normal;
 				
@@ -37,7 +40,7 @@
 			#ifdef FRAGMENT
 			void main()
 			{
-				gl_FragColor = vec4(vec3(1, 1, 1) * light, 1);
+				gl_FragColor = vec4(_Color.rgb * light, _Color.a);
 			}
 			#endif
         

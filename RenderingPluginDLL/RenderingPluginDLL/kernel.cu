@@ -22,10 +22,6 @@
 #define NOMINAX
 #define EXPORT_API __declspec(dllexport)
 
-#define FREQ 4.0f
-#define BLOCK_DIM_X 11
-#define BLOCK_DIM_Y 11
-
 typedef void(*FuncPtr)(const char *);
 FuncPtr Debug;
 
@@ -54,9 +50,10 @@ __global__ void plugin_kernel(cudaSurfaceObject_t cso, cudaSurfaceObject_t nCso,
 	unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
 
 	float freq = 4.0f;
+	float attenuation = 0.5f;
 
 	float4 vert = surf2Dread<float4>(cso, (int)sizeof(float4)*x, y, cudaBoundaryModeZero);
-	vert.y = sinf(vert.x * freq + time) * cosf(vert.z * freq + time);
+	vert.y = sinf(vert.x * freq + time) * cosf(vert.z * freq + time) * attenuation;
 
 	surf2Dwrite(vert, cso, (int)sizeof(float4) * x, y, cudaBoundaryModeZero);
 
@@ -162,7 +159,7 @@ void UpdateVertsInTex()
 	cudaSurfaceObject_t nCso;
 	CheckPluginErrors(cudaCreateSurfaceObject(&nCso, &nDesc), "Error encountered while creating Surface Object.");
 
-	dim3 block(BLOCK_DIM_X, BLOCK_DIM_Y, 1);
+	dim3 block(meshSize, meshSize, 1);
 	dim3 grid(meshSize / block.x, meshSize / block.y, 1);
 	plugin_kernel << < grid, block >> >(cso, nCso, meshSize, devTArray, triangleCount, unityTime);
 
