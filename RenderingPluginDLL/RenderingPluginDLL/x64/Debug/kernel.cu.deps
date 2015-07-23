@@ -694,5 +694,7 @@ C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\math.h
 C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc\helper_cuda.h
 C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc\helper_cuda_gl.h
 C:\Program Files (x86)\Windows Kits\8.1\Include\um\GL/gl.h
+C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc\cutil_math.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\cuda_runtime.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\vector_types.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\math.h
