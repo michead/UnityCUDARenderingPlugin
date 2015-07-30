@@ -163,10 +163,16 @@ public class RenderingPlugin : MonoBehaviour
     void setMeshUVs()
     {
         Vector2[] uvs = new Vector2[mesh.vertices.Length];
+        int texSide = (int)Math.Sqrt(uvs.Length);
 
         for (int i = 0; i < uvs.Length; i++)
         {
-            uvs[i] = new Vector2(mesh.vertices[i].x, mesh.vertices[i].z);
+            int row = i / texSide;
+            int col = i % texSide;
+
+            uvs[i] = new Vector2
+                (((float)row / texSide + (float)(row + 1) / texSide) / 2.0f,
+                ((float)col / texSide + (float)(col + 1) / texSide) / 2.0f);
         }
 
         mesh.uv = uvs;
