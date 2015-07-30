@@ -187,7 +187,7 @@ void InitializeFaceIndex()
 		}
 	}
 
-	faceOffset[texSize * texSize] = texSize * texSize;
+	faceOffset[texSize * texSize] = faceCount;
 
 	faceIndex = (int*)malloc(faceCount * sizeof(int));
 
@@ -253,7 +253,7 @@ extern "C" EXPORT_API void Init(int size, void* tPtr, void* nTPtr, int* tr, int 
 	grid = dim3(texSize / block.x, texSize / block.y, 1);
 
 	blockF = dim3(MAX_BLOCK_SIZE_X, 1, 1);
-	gridF = dim3(trCount / (blockF.x * 3), 1, 1);
+	gridF = dim3(ceilf((float)trCount / (blockF.x * 3)), 1, 1);
 
 	InitializeFaceIndex();
 
