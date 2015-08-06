@@ -22,6 +22,14 @@ public class RenderingPlugin : MonoBehaviour
     private static String TEXTURE_SIZE_ID = "texSize";
     private static float ROTATION_SCALE = 5;
 
+    private static int frameCount = 0;
+    private static float dt = 0.0f;
+    private static float fps = 0.0f;
+    private static float updateRate = 4.0f;
+    private static Rect rect;
+    private static Rect errRect;
+    private static string errMessage;
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
 
@@ -70,8 +78,8 @@ public class RenderingPlugin : MonoBehaviour
         SetDebugFunction(intptrDelegate);
 
         material = GetComponent<Renderer>().material;
-        if (useGLSLShader) material.shader = Shader.Find("Custom/PluginShader");
-        else material.shader = Shader.Find("Custom/PluginShader2");
+        if (useGLSLShader) material.shader = Resources.Load<Shader>("Shaders/PluginShader");
+        else material.shader = Resources.Load<Shader>("Shaders/PluginShader2");
 
         tex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
         FillTextureWithData(tex, verts);
@@ -88,6 +96,9 @@ public class RenderingPlugin : MonoBehaviour
 
         Init(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
+        rect = new Rect(50, 50, 250, 100);
+        errRect = new Rect(50, 150, 250, 100);
+
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
 
@@ -100,6 +111,22 @@ public class RenderingPlugin : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(1)) isRotating = false;
         else if (isRotating) RotateMesh();
+        else if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
+        frameCount++;
+        dt += Time.deltaTime;
+        if (dt > 1.0f / updateRate)
+        {
+            fps = frameCount / dt;
+            frameCount = 0;
+            dt -= 1.0f / updateRate;
+        }
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(rect, "FPS: " + (int)fps);
+        GUI.Label(errRect, errMessage);
     }
 
     void RotateMesh()
@@ -210,6 +237,7 @@ public class RenderingPlugin : MonoBehaviour
 
     static void callback(string str)
     {
+        errMessage += str + "\n";
         Debug.Log("Callback: " + str);
     }
 

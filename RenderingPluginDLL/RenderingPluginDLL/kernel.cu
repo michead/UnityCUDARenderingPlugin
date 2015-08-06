@@ -133,7 +133,7 @@ void CheckPluginErrors(cudaError err, const char* context)
 		const char* errName = cudaGetErrorName(err);
 		const char* errString = cudaGetErrorString(err);
 
-		char* errMessage = (char*)calloc(strlen(errName) + strlen(errString) + 8, sizeof(char));
+		char* errMessage = (char*)calloc(strlen(context) + strlen(errName) + strlen(errString) + 8, sizeof(char));
 		strcpy(errMessage, context);
 		strcat(errMessage, " --> ");
 		strcat(errMessage, errName);
@@ -250,7 +250,7 @@ extern "C" EXPORT_API void Init(int size, void* tPtr, void* nTPtr, int* tr, int 
 	CheckPluginErrors(cudaCreateSurfaceObject(&nCso, &nDesc), "Error encountered while creating Surface Object.");
 
 	block = dim3(MAX_BLOCK_SIZE_X, MAX_BLOCK_SIZE_Y, 1);
-	grid = dim3(texSize / block.x, texSize / block.y, 1);
+	grid = dim3(ceilf((float)texSize / block.x), texSize / block.y, 1);
 
 	blockF = dim3(MAX_BLOCK_SIZE_X, 1, 1);
 	gridF = dim3(ceilf((float)trCount / (blockF.x * 3)), 1, 1);
