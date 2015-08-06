@@ -16,8 +16,6 @@ public class RenderingPlugin : MonoBehaviour
 
     private static int UNITY_RENDER_EVENT_ID = 0;
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
-    private static String TEXTURE_SIZE_ID = "texSize";
-    private static float ROTATION_SCALE = 5;
 
     private static int frameCount = 0;
     private static float dt = 0.0f;
@@ -29,6 +27,7 @@ public class RenderingPlugin : MonoBehaviour
 
     #region UNUSED
     // private bool isRotating = false;
+    private static float ROTATION_SCALE = 5;
     #endregion
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -94,7 +93,6 @@ public class RenderingPlugin : MonoBehaviour
         nTex.Apply();
 
         material.SetTexture(NORMAL_TEXTURE_ID, nTex);
-        material.SetInt(TEXTURE_SIZE_ID, texSize);
 
         Init(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
