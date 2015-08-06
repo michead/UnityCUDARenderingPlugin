@@ -126,7 +126,7 @@ __global__ void normal_kernel(cudaSurfaceObject_t nCso, float3* normals, int mes
 	surf2Dwrite(normalize(normal), nCso, (int)sizeof(float4) * x, y, cudaBoundaryModeZero);
 }
 
-void CheckPluginErrors(cudaError err, const char* context)
+inline void CheckPluginErrors(cudaError err, const char* context)
 {
 	if (err != cudaSuccess)
 	{
@@ -146,6 +146,7 @@ void CheckPluginErrors(cudaError err, const char* context)
 
 void UpdateVertsInTex()
 {	
+
 	vertex_kernel << < grid, block >> >(cso, texSize, unityTime);
 	CheckPluginErrors(cudaGetLastError(), "Error in vertex_kernel execution.");
 	CheckPluginErrors(cudaDeviceSynchronize(), "Error in device synchronization.");

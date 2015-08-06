@@ -8,14 +8,11 @@ public class RenderingPlugin : MonoBehaviour
 {
     public static Mesh mesh;
     public string meshURL;
-    public bool useGLSLShader = true;
-    public bool useMeshPath = false;
 
     private static int texSize;
     private static Texture2D tex, nTex;
     private Vector2 oldMousePos;
-    private bool isRotating = false;
-    private static Material material;
+    public Shader shader;
 
     private static int UNITY_RENDER_EVENT_ID = 0;
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
@@ -29,6 +26,10 @@ public class RenderingPlugin : MonoBehaviour
     private static Rect rect;
     private static Rect errRect;
     private static string errMessage;
+
+    #region UNUSED
+    // private bool isRotating = false;
+    #endregion
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MyDelegate(string str);
@@ -56,17 +57,19 @@ public class RenderingPlugin : MonoBehaviour
 
     IEnumerator Start()
     {
-        if (useMeshPath)
+        if (meshURL == null)
         {
-            if (meshURL == null)
-            {
-                Debug.Log("Please choose a mesh to render!");
-                yield return null;
-            }
-            else getMeshDataFromFile(meshURL);
+            Debug.Log("No mesh path selected.");
+            Application.Quit();
         }
-        else mesh = GetComponent<MeshFilter>().mesh;
 
+        if (shader == null)
+        {
+            Debug.Log("No shader selected.");
+            Application.Quit();
+        }
+
+        getMeshDataFromFile(meshURL);
 
         float texSizeF = (float)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
         texSize = texSizeF == (int)texSizeF ? (int)texSizeF : (int)texSizeF + 1;
@@ -77,9 +80,8 @@ public class RenderingPlugin : MonoBehaviour
         IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
         SetDebugFunction(intptrDelegate);
 
-        material = GetComponent<Renderer>().material;
-        if (useGLSLShader) material.shader = Resources.Load<Shader>("Shaders/PluginShader");
-        else material.shader = Resources.Load<Shader>("Shaders/PluginShader2");
+        Material material = GetComponent<Renderer>().material;
+        material.shader = shader;
 
         tex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
         FillTextureWithData(tex, verts);
@@ -96,14 +98,26 @@ public class RenderingPlugin : MonoBehaviour
 
         Init(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
 
-        rect = new Rect(50, 50, 250, 100);
-        errRect = new Rect(50, 150, 250, 100);
+        rect = new Rect(50, 50, 250, 25);
+        errRect = new Rect(50, 75, 250, 100);
 
         yield return StartCoroutine("CallPluginAtEndOfFrames");
     }
 
+    public void SetMeshURL(string path)
+    {
+        meshURL = path;
+    }
+
+    public void SetShader(string path)
+    {
+        shader = Resources.Load<Shader>(path);
+    }
+
     void Update()
     {
+        #region UNUSED
+        /*
         if (Input.GetMouseButtonDown(1))
         {
             isRotating = true;
@@ -111,7 +125,10 @@ public class RenderingPlugin : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(1)) isRotating = false;
         else if (isRotating) RotateMesh();
-        else if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+        */
+        #endregion
+
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
         frameCount++;
         dt += Time.deltaTime;
@@ -129,6 +146,7 @@ public class RenderingPlugin : MonoBehaviour
         GUI.Label(errRect, errMessage);
     }
 
+    #region UNUSED
     void RotateMesh()
     {
         Vector2 mousePos = new Vector2( Input.mousePosition.x, Input.mousePosition.y );
@@ -138,6 +156,7 @@ public class RenderingPlugin : MonoBehaviour
         transform.Rotate(-Vector3.right * delta.y * Time.deltaTime * ROTATION_SCALE);
         transform.Rotate(Vector3.forward * delta.x * Time.deltaTime * ROTATION_SCALE);
     }
+    #endregion
 
     void OnApplicationQuit()
     {
@@ -237,8 +256,8 @@ public class RenderingPlugin : MonoBehaviour
 
     static void callback(string str)
     {
-        errMessage += str + "\n";
-        Debug.Log("Callback: " + str);
+        errMessage = str;
+        // Debug.Log("Callback: " + str);
     }
 
     byte[] getBytesFromVector3Array(Vector3[] array)
