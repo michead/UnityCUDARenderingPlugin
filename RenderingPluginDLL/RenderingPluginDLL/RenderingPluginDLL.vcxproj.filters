@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Particle System">
+      <UniqueIdentifier>{fd67db17-ba9b-42d0-99c2-8fd60634e825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vecmath">
+      <UniqueIdentifier>{4de01067-e1a2-442c-9549-badd2679202b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\inc\vecmath\Matrix2f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Matrix3f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Matrix4f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Quat4f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\vecmath.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Vector2f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Vector3f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\vecmath\Vector4f.h">
+      <Filter>vecmath</Filter>
+    </ClInclude>
+    <ClInclude Include="timeStepper.h">
+      <Filter>Particle System</Filter>
+    </ClInclude>
+    <ClInclude Include="particleSystem.h">
+      <Filter>Particle System</Filter>
+    </ClInclude>
+    <ClInclude Include="wobblyCube.h">
+      <Filter>Particle System</Filter>
+    </ClInclude>
+    <ClInclude Include="springSystem.h">
+      <Filter>Particle System</Filter>
+    </ClInclude>
+    <ClInclude Include="spring.h">
+      <Filter>Particle System</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="timeStepper.cpp">
+      <Filter>Particle System</Filter>
+    </ClCompile>
+    <ClCompile Include="particleSystem.cpp">
+      <Filter>Particle System</Filter>
+    </ClCompile>
+    <ClCompile Include="wobblyCube.cpp">
+      <Filter>Particle System</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

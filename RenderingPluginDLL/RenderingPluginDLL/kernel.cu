@@ -19,6 +19,9 @@
 #include <sstream>
 #include <math.h>
 
+#include "wobblyCube.h"
+#include "timeStepper.h"
+
 #include <Windows.h>
 
 #define WINDOWS_MEAN_AND_LEAN
@@ -61,8 +64,102 @@ static GLuint nTexID;
 
 static float unityTime;
 
+static WobblyCube* cube;
+static TimeStepper* ts;
+
+extern "C" EXPORT_API void Init(int size, void* tPtr, void* nTPtr, int* tr, int trCount);
+inline void CheckPluginErrors(cudaError err, const char* context);
+
 extern "C" void EXPORT_API SetTimeFromUnity(float t) { unityTime = t; }
 
+extern "C" void EXPORT_API GetCubeState(float3* state)
+{
+	for (unsigned i = 0; i < CUBE_WIDTH * CUBE_HEIGHT * CUBE_LENGTH * 2; i++) state[i] = cube->state[i];
+}
+
+extern "C" float3 EXPORT_API GetCubeDims()
+{
+	return float3{ CUBE_LENGTH, CUBE_HEIGHT, CUBE_WIDTH };
+}
+
+extern "C" void EXPORT_API GetCubeFaces(int* faces)
+{
+	for (unsigned i = 0; i < cube->faceCount; i++) faces[i] = cube->faces[i];
+}
+
+extern "C" float3 EXPORT_API InitCube()
+{
+	cube = new WobblyCube();
+
+	return float3{ cube->vertCount, CUBE_WIDTH * CUBE_HEIGHT * CUBE_LENGTH * 2, cube->faceCount };
+}
+
+extern "C" void EXPORT_API DragTriangle(int triangle, float3 target)
+{
+	cube->state[cube->faces[3 * triangle]] = target;
+	cube->state[cube->faces[3 * triangle] + 1] = {0, 0, 0};
+
+	/*
+	cube->state[cube->faces[3 * triangle + 1]] = target;
+	cube->state[cube->faces[3 * triangle + 1] + 1] = { 0, 0, 0 };
+
+	cube->state[cube->faces[3 * triangle + 2]] = target;
+	cube->state[cube->faces[3 * triangle + 2] + 1] = { 0, 0, 0 };
+	*/
+}
+
+__global__ void ps_vertex_kernel(cudaSurfaceObject_t cso, unsigned* indices, float3* verts, unsigned vertCount, int meshSize)
+{
+	unsigned int x = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int y = blockIdx.y*blockDim.y + threadIdx.y;
+
+	if (meshSize * x + y >= vertCount) return;
+
+	unsigned index = indices[meshSize * x + y];
+
+	float3 vert3 = verts[index];
+	float4 vert4 = { vert3.x, vert3.y, vert3.z, 0 };
+
+	surf2Dwrite(vert4, cso, (int)sizeof(float4) * x, y, cudaBoundaryModeZero);
+}
+
+extern "C" void EXPORT_API InitPS(int size, void* tPtr, void* nTPtr)
+{
+	ts = new RK4();
+
+	// Init(size, tPtr, nTPtr, cube->faces, cube->faceCount);
+
+	unsigned* devVArray;
+	float3* devSArray;
+
+	CheckPluginErrors(cudaMalloc((void**)&devVArray, cube->vertCount * sizeof(unsigned)), "Error encountered while allocating memory on device");
+	CheckPluginErrors(cudaMemcpy(devVArray, cube->verts, cube->vertCount * sizeof(unsigned), cudaMemcpyHostToDevice), "Error encountered while copying array to device");
+
+	CheckPluginErrors(cudaMalloc((void**)&devSArray, cube->stateCount * sizeof(float3)), "Error encountered while allocating memory on device");
+	CheckPluginErrors(cudaMemcpy(devSArray, cube->state, cube->stateCount * sizeof(float3), cudaMemcpyHostToDevice), "Error encountered while copying array to device");
+
+	texPtr = tPtr;
+	texID = (GLuint)(size_t)(texPtr);
+
+	CheckPluginErrors(cudaGraphicsGLRegisterImage(&cgr, texID, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone), "Error encountered while registering resource.");
+
+	resources = (cudaGraphicsResource_t*)malloc(sizeof(cudaGraphicsResource_t));
+	*resources = cgr;
+	CheckPluginErrors(cudaGraphicsMapResources(1, resources), "Error encountered while mapping resources");
+
+	cudaArray_t cudaArray;
+	CheckPluginErrors(cudaGraphicsSubResourceGetMappedArray(&cudaArray, cgr, 0, 0), "Error encountered while mapping graphics resource to CUDA array.");
+
+	cudaResourceDesc desc;
+	desc.resType = cudaResourceTypeArray;
+	desc.res.array.array = cudaArray;
+
+	CheckPluginErrors(cudaCreateSurfaceObject(&cso, &desc), "Error encountered while creating Surface Object.");
+
+	ps_vertex_kernel << < grid, block >> >(cso, devVArray, devSArray, cube->vertCount, texSize);
+	CheckPluginErrors(cudaGetLastError(), "Error in ps_vertex_kernel execution.");
+	CheckPluginErrors(cudaDeviceSynchronize(), "Error in device synchronization.");
+}
 
 __global__ void vertex_kernel(cudaSurfaceObject_t cso, int meshSize, float time)
 {
@@ -126,7 +223,7 @@ __global__ void normal_kernel(cudaSurfaceObject_t nCso, float3* normals, int mes
 	surf2Dwrite(normalize(normal), nCso, (int)sizeof(float4) * x, y, cudaBoundaryModeZero);
 }
 
-inline void CheckPluginErrors(cudaError err, const char* context)
+void CheckPluginErrors(cudaError err, const char* context)
 {
 	if (err != cudaSuccess)
 	{
@@ -144,9 +241,13 @@ inline void CheckPluginErrors(cudaError err, const char* context)
 	}
 }
 
-void UpdateVertsInTex()
-{	
+void TakeStep()
+{
+	ts->takeStep(cube, unityTime);
+}
 
+void UpdateVertsInTex()
+{
 	vertex_kernel << < grid, block >> >(cso, texSize, unityTime);
 	CheckPluginErrors(cudaGetLastError(), "Error in vertex_kernel execution.");
 	CheckPluginErrors(cudaDeviceSynchronize(), "Error in device synchronization.");
@@ -162,7 +263,8 @@ void UpdateVertsInTex()
 
 extern "C" void EXPORT_API UnityRenderEvent(int eventID)
 {
-	UpdateVertsInTex();
+	if(!eventID) UpdateVertsInTex();
+	else TakeStep();
 }
 
 extern "C" EXPORT_API void SetDebugFunction(FuncPtr fp)
@@ -285,4 +387,10 @@ extern "C" EXPORT_API void Cleanup()
 	CheckPluginErrors(cudaFree(devFIArray), "Error encountered while freeing memory on device");
 	CheckPluginErrors(cudaFree(devFOArray), "Error encountered while freeing memory on device");
 	CheckPluginErrors(cudaFree(devFNArray), "Error encountered while freeing memory on device");
+}
+
+extern "C" EXPORT_API void CleanupPS()
+{
+	delete cube;
+	delete ts;
 }

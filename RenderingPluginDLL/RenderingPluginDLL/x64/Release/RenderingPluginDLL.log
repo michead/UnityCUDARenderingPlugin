@@ -1,0 +1,73 @@
+﻿Build started 8/16/2015 2:19:06 AM.
+     1>Project "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\RenderingPluginDLL.vcxproj" on node 2 (Rebuild target(s)).
+     1>CudaClean:
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmp17f4ae69525a4317b0e7ae7644809f29.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile      -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean
+         
+         C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile      -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" -clean 
+         kernel.cu
+       AddCudaCompileDeps:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /DWIN64 /DNDEBUG /D_CONSOLE /D_WINDLL /D_MBCS /I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" /I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
+       CudaBuild:
+         Compiling CUDA source file kernel.cu...
+         cmd.exe /C "C:\Users\Simone\AppData\Local\Temp\tmp21226fa905af42f8a3209b9c02f4d58b.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu"
+         
+         C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"  -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o x64\Release\kernel.cu.obj "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\kernel.cu" 
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(94): warning : invalid narrowing conversion from "unsigned int" to "float"
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(94): warning : invalid narrowing conversion from "unsigned int" to "float"
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(94): warning : invalid narrowing conversion from "unsigned int" to "float"
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(94): warning : invalid narrowing conversion from "unsigned int" to "float"
+         kernel.cu
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(94): warning C4244: 'initializing' : conversion from 'unsigned int' to 'float', possible loss of data
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(342): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
+     1>C:/Users/Simone/Desktop/Rendering Plugin/RenderingPluginDLL/RenderingPluginDLL/kernel.cu(345): warning C4244: 'argument' : conversion from 'float' to 'unsigned int', possible loss of data
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /Zi /nologo /W3 /WX- /O2 /Oi /GL /D WIN32 /D WIN64 /D NDEBUG /D _CONSOLE /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt particleSystem.cpp timeStepper.cpp wobblyCube.cpp
+         particleSystem.cpp
+         timeStepper.cpp
+     1>timeStepper.cpp(17): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(19): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(21): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(23): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(25): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(27): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(29): warning C4018: '<' : signed/unsigned mismatch
+     1>timeStepper.cpp(31): warning C4018: '<' : signed/unsigned mismatch
+         wobblyCube.cpp
+     1>wobblyCube.cpp(156): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(163): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(170): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(177): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(185): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(192): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(199): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(206): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(214): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(221): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(228): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(235): warning C4244: 'argument' : conversion from 'double' to 'unsigned __int64', possible loss of data
+     1>wobblyCube.cpp(323): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+     1>wobblyCube.cpp(325): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.dll" /NOLOGO /LIBPATH:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\lib" /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib freeglut.lib glew64.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.lib" /MACHINE:X64 /DLL x64\Release\kernel.cu.obj
+         x64\Release\particleSystem.obj
+         x64\Release\timeStepper.obj
+         x64\Release\wobblyCube.obj
+            Creating library C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.lib and object C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.exp
+         Generating code
+         Finished generating code
+         RenderingPluginDLL.vcxproj -> C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\RenderingPluginDLL.dll
+       PostBuildEvent:
+         echo copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\"
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\"
+         :VCEnd
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPlugin\Assets\"
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart32_70.dll
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart64_70.dll
+                 2 file copiati.
+     1>Done Building Project "C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\RenderingPluginDLL\RenderingPluginDLL.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:10.59

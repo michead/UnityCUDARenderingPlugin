@@ -99,6 +99,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,6 +143,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Simone\Desktop\Rendering Plugin\RenderingPluginDLL\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -162,6 +164,26 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\inc\vecmath\Matrix2f.h" />
+    <ClInclude Include="..\inc\vecmath\Matrix3f.h" />
+    <ClInclude Include="..\inc\vecmath\Matrix4f.h" />
+    <ClInclude Include="..\inc\vecmath\Quat4f.h" />
+    <ClInclude Include="..\inc\vecmath\vecmath.h" />
+    <ClInclude Include="..\inc\vecmath\Vector2f.h" />
+    <ClInclude Include="..\inc\vecmath\Vector3f.h" />
+    <ClInclude Include="..\inc\vecmath\Vector4f.h" />
+    <ClInclude Include="particleSystem.h" />
+    <ClInclude Include="spring.h" />
+    <ClInclude Include="springSystem.h" />
+    <ClInclude Include="timeStepper.h" />
+    <ClInclude Include="wobblyCube.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="particleSystem.cpp" />
+    <ClCompile Include="timeStepper.cpp" />
+    <ClCompile Include="wobblyCube.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,7 +14,9 @@ public class RenderingPlugin : MonoBehaviour
     private Vector2 oldMousePos;
     public Shader shader;
 
-    private static int UNITY_RENDER_EVENT_ID = 0;
+    private static int eventID;
+    public bool enableParticleSystem;
+
     private static String NORMAL_TEXTURE_ID = "_BumpMap";
 
     private static int frameCount = 0;
@@ -47,6 +49,20 @@ public class RenderingPlugin : MonoBehaviour
     private static extern void ParallelComputeSineWave([In, Out] Vector3[] verts, float time);
     [DllImport("RenderingPluginDLL")]
     private static extern void SetTimeFromUnity(float t);
+    [DllImport("RenderingPluginDLL")]
+    private static extern Vector3 InitCube();
+    [DllImport("RenderingPluginDLL")]
+    private static extern void InitPS(int sideSize, IntPtr texPtr, IntPtr nTexPtr);
+    [DllImport("RenderingPluginDLL")]
+    private static extern void CleanupPS();
+    [DllImport("RenderingPluginDLL")]
+    private static extern void GetCubeState([In, Out] Vector3[] state);
+    [DllImport("RenderingPluginDLL")]
+    private static extern Vector3 GetCubeDims();
+    [DllImport("RenderingPluginDLL")]
+    private static extern void GetCubeFaces([In, Out] int[] faces);
+    [DllImport("RenderingPluginDLL")]
+    private static extern void DragTriangle(int triangle, Vector3 target);
 
     Vector3[] verts;
     int[] triangles;
@@ -54,7 +70,70 @@ public class RenderingPlugin : MonoBehaviour
     int numVerts;
     int numFaces;
 
+    bool isPicking, drag;
+    int triangle;
+    float rayLen;
+
+    int vertCount, stateCount, faceCount;
+
     IEnumerator Start()
+    {
+        eventID = enableParticleSystem ? 1 : 0;
+
+        mesh = GetComponent<MeshFilter>().mesh;
+
+        Material material = GetComponent<Renderer>().material;
+        material.shader = shader;
+
+        if (enableParticleSystem) InitParticleSystem();
+        else InitSinDemo();
+
+        material.mainTexture = tex;
+        material.SetTexture(NORMAL_TEXTURE_ID, nTex);
+
+        MyDelegate callbackDelegate = new MyDelegate(callback);
+        IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
+        SetDebugFunction(intptrDelegate);
+
+        rect = new Rect(50, 50, 250, 25);
+        errRect = new Rect(50, 75, 250, 100);
+
+        yield return StartCoroutine("CallPluginAtEndOfFrames");
+    }
+
+    public void InitParticleSystem()
+    {
+        Vector3 cubeCounters = InitCube();
+
+        vertCount = (int)cubeCounters[0];
+        stateCount = (int)cubeCounters[1];
+        faceCount = (int)cubeCounters[2];
+
+        float texSizeF = (float)Math.Sqrt(vertCount);
+        texSize = texSizeF == (int)texSizeF ? (int)texSizeF : (int)texSizeF + 1;
+
+        verts = new Vector3[stateCount];
+        triangles = new int[faceCount];
+
+        GetCubeState(verts);
+        GetCubeFaces(triangles);
+
+        mesh.vertices = verts;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+
+        tex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
+        tex.Apply();
+
+        nTex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
+        nTex.Apply();
+
+        InitPS(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr());
+
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
+    public void InitSinDemo()
     {
         if (meshURL == null)
         {
@@ -70,36 +149,30 @@ public class RenderingPlugin : MonoBehaviour
 
         getMeshDataFromFile(meshURL);
 
-        float texSizeF = (float)Math.Sqrt(GetComponent<MeshFilter>().mesh.vertexCount);
+        float texSizeF = (float)Math.Sqrt(mesh.vertexCount);
         texSize = texSizeF == (int)texSizeF ? (int)texSizeF : (int)texSizeF + 1;
-
-        verts = GetComponent<MeshFilter>().mesh.vertices;
-
-        MyDelegate callbackDelegate = new MyDelegate(callback);
-        IntPtr intptrDelegate = Marshal.GetFunctionPointerForDelegate(callbackDelegate);
-        SetDebugFunction(intptrDelegate);
-
-        Material material = GetComponent<Renderer>().material;
-        material.shader = shader;
 
         tex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
         FillTextureWithData(tex, verts);
         tex.Apply();
-        material.mainTexture = tex;
-
-        triangles = mesh.triangles;
+        
         nTex = new Texture2D(texSize, texSize, TextureFormat.RGBAFloat, false);
         FillTextureWithData(nTex, mesh.normals);
         nTex.Apply();
 
-        material.SetTexture(NORMAL_TEXTURE_ID, nTex);
-
         Init(texSize, tex.GetNativeTexturePtr(), nTex.GetNativeTexturePtr(), mesh.triangles, mesh.triangles.Length);
+    }
 
-        rect = new Rect(50, 50, 250, 25);
-        errRect = new Rect(50, 75, 250, 100);
-
-        yield return StartCoroutine("CallPluginAtEndOfFrames");
+    void pickTriangle()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            triangle = hit.triangleIndex;
+            rayLen = (ray.origin - hit.point).magnitude;
+        }
+        else triangle = -1;
     }
 
     public void SetMeshURL(string path)
@@ -136,6 +209,16 @@ public class RenderingPlugin : MonoBehaviour
             frameCount = 0;
             dt -= 1.0f / updateRate;
         }
+
+        if (isPicking && triangle >= 0 &&  (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)) drag = true;
+        else drag = false;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            isPicking = true;
+            pickTriangle();
+        }
+        else if (Input.GetMouseButtonUp(0)) isPicking = false;
     }
 
     void OnGUI()
@@ -158,13 +241,12 @@ public class RenderingPlugin : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Cleanup();
+        if (!enableParticleSystem) Cleanup();
+        else CleanupPS();
     }
 
     void getMeshDataFromFile(string url)
     {
-        mesh = new Mesh();
-
         getVertsFromFile(url);
         getFacesFromFile(url);
 
@@ -172,8 +254,6 @@ public class RenderingPlugin : MonoBehaviour
         mesh.triangles = triangles;
 
         setMeshUVs();
-
-        GetComponent<MeshFilter>().mesh = mesh;
     }
 
     void getVertsFromFile(string url) 
@@ -295,9 +375,23 @@ public class RenderingPlugin : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
 
-            SetTimeFromUnity(Time.timeSinceLevelLoad);
+            if (enableParticleSystem) SetTimeFromUnity(Time.deltaTime);
+            else SetTimeFromUnity(Time.timeSinceLevelLoad);
 
-            GL.IssuePluginEvent(UNITY_RENDER_EVENT_ID);
+            GL.IssuePluginEvent(eventID);
+
+            if (enableParticleSystem)
+            {
+                if (drag)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    DragTriangle(triangle, ray.GetPoint(rayLen));
+                }
+
+                GetCubeState(verts);
+                mesh.vertices = verts;
+                mesh.RecalculateNormals();
+            }
         }
     }
 }
